@@ -6,7 +6,7 @@
 #    By: clesaffr <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/02 20:58:41 by clesaffr          #+#    #+#              #
-#    Updated: 2023/01/02 21:34:06 by clesaffr         ###   ########.fr        #
+#    Updated: 2023/01/03 15:20:05 by clesaffr         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,11 +45,10 @@ $(PATH_OBJS)	:
 					mkdir -p $(PATH_OBJS)
 
 $(NAME)			:	$(F_OBJS)
-					$(CC) $(CFLAGS) $(INCLUDES) -L$(PATH_LIBFT) -lreadline -o $(NAME) $(F_OBJS) 
+					$(CC) $(CFLAGS) $(F_OBJS) -Iincludes -lreadline -o $(NAME) $(F_LIBFT) 
 
 $(PATH_OBJS)%.o	:	$(PATH_SRCS)%.c
 					$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
 clean			:
 					rm -rf $(F_OBJS) $(PATH_OBJS)
 					make clean -C $(PATH_LIBFT)
