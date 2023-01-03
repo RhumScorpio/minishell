@@ -6,53 +6,66 @@
 /*   By: clesaffr <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/02 17:22:50 by clesaffr          #+#    #+#             */
-/*   Updated: 2023/01/03 15:02:48 by clesaffr         ###   ########.fr       */
+/*   Updated: 2023/01/03 20:24:54 by clesaffr         ###   ########.fr       */
 /*                                                                            */
-#ifndef MINISHELL_H
-# define MINISHELL_H
-
-# include "../libft/libft.h"
-# include <readline/readline.h>
-# include <readline/history.h>
-
-typedef	struct s_command_line
-{
-	char	*command;
-	int		fd;
-	int		env;
-}				t_command_line;
-
-#endif
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-#include "../libft/libft.h"
-#include <readline/readline.h>
-#include <readline/history.h>
 
 void	signal_cmd(int sig)
 {
 	if (sig == SIGQUIT)
-	{
-		write(1, "Quit (core dumped)\n", ft_strlen("Quit (core dumped)\n"));
 		exit (1);
+}
+
+void	free_all(t_command_line *first)
+{
+	t_command_line	*tmp;
+
+	tmp = first;
+	while (tmp->next)
+	{
+		free(tmp->command);
+		tmp = tmp->next;
 	}
+	free(tmp->command);
+}
+
+void	command_line(char *cmd, t_command_line *first)
+{
+	t_command_line	*tmp;
+
+	tmp = first;
+	while (tmp->next)
+	{
+		tmp = tmp->next;
+	}
+	tmp->command = cmd;
+	tmp->next = NULL;
 }
 
 int	main(int ac, char **av)
 {
+	static t_command_line	*first;	
 	char			*cmd;
 
 	(void)ac;
 	(void)av;
+	first->command = readline("minishell$> ");
+	first->next = NULL;
 	while (1)
 	{
 		cmd = readline("minishell$> ");
+		add_history(cmd);
 		printf("cmd = %s\n", cmd);
+		command_line(cmd, first);
 		if (ft_strcmp(cmd, "exit"))
+		{
+			free(cmd);
+			free_all(first);
 			exit (1);
+		}
 		signal(SIGINT, signal_cmd);
 		signal(SIGQUIT, SIG_IGN);
-		free(cmd);
 	}
 }
