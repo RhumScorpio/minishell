@@ -1,0 +1,55 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_heredoc.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: alewalla <alewalla@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/09/13 14:10:38 by alewalla          #+#    #+#             */
+/*   Updated: 2023/02/21 17:56:24 by alewalla         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
+int	ft_close_and_return(int *pip)
+{
+	close(pip[1]);
+	return (pip[0]);
+}
+
+void	ft_put_heredoc_exit(char *str)
+{
+	ft_putstr_fd("minishell:warning: here-document at ", 2);
+	ft_putstr_fd("line 3 delimited by end-of-file (wanted '", 2);
+	ft_putstr_fd(str, 2);
+	ft_putstr_fd("')\n", 2);
+}
+
+int	ft_heredoc(char *str)
+{
+	char	*line_read;
+	int		pip[2];
+	int		i;
+
+	i = 0;
+	if (pipe(pip) == -1)
+		return (-2);
+	while (1)
+	{
+		line_read = readline("heredoc> ");
+		if (line_read == NULL)
+		{
+			ft_put_heredoc_exit(str);
+			return (ft_close_and_return(pip));
+		}
+		if (ft_strcmp(line_read, str) == 0)
+		{
+			free(line_read);
+			return (ft_close_and_return(pip));
+		}
+		ft_putstr_fd(line_read, pip[1]);
+		ft_putchar_fd('\n', pip[1]);
+		free(line_read);
+	}
+}
